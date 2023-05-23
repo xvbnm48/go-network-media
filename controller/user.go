@@ -24,12 +24,27 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		errorMessage := helper.ApiResponse("Register account failed", 422, "error", errors)
 		response := helper.ApiResponse("Register account failed", 422, "error", errorMessage)
 		c.JSON(422, response)
+		return
 	}
 	newUser, err := h.service.RegisterUser(userInput)
 	if err != nil {
-		c.JSON(422, gin.H{"errors": err.Error()})
+		errors := helper.FormatValidationError(err)
+		errorMessage := helper.ApiResponse("Register account failed", 422, "error", errors)
+		response := helper.ApiResponse("Register account failed", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
 	}
-	c.JSON(200, newUser)
+	token, err := h.auth.GenerateToken(newUser.Id)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := helper.ApiResponse("Register account failed", 422, "error", errors)
+		response := helper.ApiResponse("Register account failed", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
+	}
+	format := user.FormatUser(newUser, token)
+	response := helper.ApiResponse("Account has been registered", 200, "success", format)
+	c.JSON(200, response)
 }
 
 func (h *userHandler) LoginUser(c *gin.Context) {
@@ -43,12 +58,14 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 		errorMessage := gin.H{"errors": err.Error()}
 		response := helper.ApiResponse("Login failed", 422, "error", errorMessage)
 		c.JSON(422, response)
+		return
 	}
 	token, err := h.auth.GenerateToken(logginUser.Id)
 	if err != nil {
 		errorMessage := gin.H{"errors": err.Error()}
 		response := helper.ApiResponse("Login failed", 422, "error", errorMessage)
 		c.JSON(422, response)
+		return
 	}
 	formatUser := user.FormatUser(logginUser, token)
 	response := helper.ApiResponse("Login success", 200, "success", formatUser)
