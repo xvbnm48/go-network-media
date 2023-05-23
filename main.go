@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/xvbnm48/go-network-media/auth"
 	"github.com/xvbnm48/go-network-media/config"
-	"github.com/xvbnm48/go-network-media/controller"
+	"github.com/xvbnm48/go-network-media/handler"
 	"github.com/xvbnm48/go-network-media/user"
 	"log"
 )
@@ -23,7 +23,7 @@ func main() {
 	//auth service
 	authService := auth.NewService()
 	// handler user
-	userHandler := controller.NewUserHandler(userService, authService)
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")
