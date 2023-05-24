@@ -9,6 +9,7 @@ import (
 type Service interface {
 	RegisterUser(input RegisterUserInput) (model.User, error)
 	LoginUser(input LoginUserInput) (model.User, error)
+	GetUserById(ID int) (model.User, error)
 }
 
 type service struct {
@@ -51,6 +52,18 @@ func (s *service) LoginUser(input LoginUserInput) (model.User, error) {
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
 		return user, err
+	}
+
+	return user, nil
+}
+
+func (s *service) GetUserById(ID int) (model.User, error) {
+	user, err := s.repo.FindUserById(ID)
+	if err != nil {
+		return user, err
+	}
+	if user.Id == 0 {
+		return user, errors.New("No user found on that ID")
 	}
 
 	return user, nil

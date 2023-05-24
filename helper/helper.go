@@ -5,8 +5,8 @@ import (
 )
 
 type Response struct {
-	Meta Meta        `json:"meta"`
-	Data interface{} `json:"data"`
+	Meta Meta `json:"meta"`
+	Data any  `json:"data"`
 }
 
 type Meta struct {
@@ -15,7 +15,7 @@ type Meta struct {
 	Status  string `json:"status"`
 }
 
-func ApiResponse(message string, code int, status string, data interface{}) Response {
+func ApiResponse(message string, code int, status string, data any) Response {
 	meta := Meta{
 		Message: message,
 		Code:    code,
