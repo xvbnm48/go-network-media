@@ -19,6 +19,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	err = config.RunMigrations(db)
 	// user repo
 	userRepository := user.NewRepository(db)
 	postRepository := post.NewPostRepository(db)
@@ -38,6 +39,8 @@ func main() {
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/login", userHandler.LoginUser)
 	api.POST("/createPost", authMiddleWare(authService, userService), postHandler.CreatePost)
+	api.POST("/post/:id", authMiddleWare(authService, userService), postHandler.UpdatePost)
+	api.GET("/posts", postHandler.GetAllPost)
 
 	router.Run(":8081")
 }
