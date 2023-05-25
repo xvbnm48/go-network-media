@@ -3,6 +3,7 @@ package post
 import "github.com/xvbnm48/go-network-media/model"
 
 type PostFormatter struct {
+	Id        int    `json:"id"`
 	Title     string `json:"title"`
 	Content   string `json:"content"`
 	Author    string `json:"author"`
@@ -11,6 +12,7 @@ type PostFormatter struct {
 
 func FormatPost(post model.Post) PostFormatter {
 	postFormat := PostFormatter{}
+	postFormat.Id = post.Id
 	postFormat.Title = post.Title
 	postFormat.Content = post.Content
 	postFormat.Author = post.Author
