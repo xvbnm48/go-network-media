@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/xvbnm48/go-network-media/auth"
 	"github.com/xvbnm48/go-network-media/helper"
+	"github.com/xvbnm48/go-network-media/model"
 	"github.com/xvbnm48/go-network-media/user"
 )
 
@@ -71,4 +72,27 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 	response := helper.ApiResponse("Login success", 200, "success", formatUser)
 	c.JSON(200, response)
 	//c.JSON(200, user)
+}
+
+func (h *userHandler) FollowFriend(c *gin.Context) {
+	friendId := user.GetFollowId{}
+	err := c.ShouldBindUri(&friendId)
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+		response := helper.ApiResponse("Get Friend Id failed", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
+	}
+	currentUser := c.MustGet("currentUser").(model.User)
+	UserId := currentUser.Id
+	_, err = h.service.FollowFriends(UserId, friendId.Id)
+	if err != nil {
+		errorMessage := gin.H{"errors": err.Error()}
+		response := helper.ApiResponse("Follow Friend failed", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
+	}
+
+	response := helper.ApiResponse("Follow Friend success", 200, "success", "success follow friend")
+	c.JSON(200, response)
 }

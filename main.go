@@ -41,6 +41,7 @@ func main() {
 	api.POST("/createPost", authMiddleWare(authService, userService), postHandler.CreatePost)
 	api.POST("/post/:id", authMiddleWare(authService, userService), postHandler.UpdatePost)
 	api.GET("/posts", postHandler.GetAllPost)
+	api.POST("/users/:id/follow", authMiddleWare(authService, userService), userHandler.FollowFriend)
 
 	router.Run(":8081")
 }

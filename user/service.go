@@ -10,6 +10,9 @@ type Service interface {
 	RegisterUser(input RegisterUserInput) (model.User, error)
 	LoginUser(input LoginUserInput) (model.User, error)
 	GetUserById(ID int) (model.User, error)
+	IsEmailAvailable(email string) (bool, error)
+	FollowFriends(userId int, friendId int) (int, error)
+	//UnfollowFriends(userId int, friendId int) (int, error)
 }
 
 type service struct {
@@ -24,6 +27,7 @@ func (s *service) RegisterUser(input RegisterUserInput) (model.User, error) {
 	user := model.User{}
 	user.Name = input.Name
 	user.Email = input.Email
+	s.IsEmailAvailable(input.Email)
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
 	if err != nil {
 		return user, err
@@ -67,4 +71,39 @@ func (s *service) GetUserById(ID int) (model.User, error) {
 	}
 
 	return user, nil
+}
+
+func (s *service) IsEmailAvailable(email string) (bool, error) {
+	user, err := s.repo.FindByEmail(email)
+	if err != nil {
+		return false, err
+	}
+
+	if user.Id == 0 {
+		return true, errors.New("No user found on that email")
+	}
+
+	return false, nil
+}
+
+func (s *service) FollowFriends(userId int, friendId int) (int, error) {
+	_, err := s.repo.FindUserById(userId)
+	if err != nil {
+		return 0, err
+	}
+	_, err = s.repo.FindUserById(friendId)
+	if err != nil {
+		return 0, err
+	}
+
+	if userId == friendId {
+		return 0, errors.New("You can't follow yourself")
+	}
+
+	_, err = s.repo.Follow(userId, friendId)
+	if err != nil {
+		return 0, err
+	}
+
+	return friendId, nil
 }

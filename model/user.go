@@ -5,4 +5,5 @@ type User struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Friends  []User `gorm:"many2many:friendships;association_jointable_foreignkey:friend_id"`
 }
