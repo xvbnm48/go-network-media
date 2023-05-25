@@ -10,6 +10,8 @@ type Repository interface {
 	Save(user model.User) (model.User, error)
 	DeleteUser(id int) error
 	FindByEmail(email string) (model.User, error)
+	Follow(userId int, friendId int) (int, error)
+	Unfollow(userId int, friendId int) (int, error)
 }
 
 type repository struct {
@@ -56,4 +58,40 @@ func (r *repository) FindByEmail(email string) (model.User, error) {
 		return user, err
 	}
 	return user, nil
+}
+
+func (r *repository) Follow(userId int, friendId int) (int, error) {
+	user := model.User{}
+	friend, err := r.FindUserById(friendId)
+	if err != nil {
+		return userId, err
+	}
+
+	err = r.db.Preload("Friends").Where("id = ?", userId).First(&user).Error
+	if err != nil {
+		return userId, err
+	}
+
+	err = r.db.Model(&user).Association("Friends").Append(&friend)
+	if err != nil {
+		return userId, err
+	}
+
+	return friendId, nil
+}
+
+func (r *repository) Unfollow(userId int, friendId int) (int, error) {
+	user := model.User{}
+	friend, err := r.FindUserById(friendId)
+	if err != nil {
+		return userId, err
+	}
+	err = r.db.Preload("Friends").Where("id ?", userId).First(&user).Error
+	if err != nil {
+		return userId, err
+	}
+
+	err = r.db.Model(&user).Association("Friends").Delete(&friend)
+
+	return friendId, nil
 }

@@ -5,10 +5,12 @@ import (
 )
 
 type Post struct {
-	Id        string    `json:"id"`
+	Id        int       `json:"id"`
 	Author    string    `json:"author"`
+	UserId    int       `json:"user_id"`
 	Title     string    `json:"caption"`
 	Content   string    `json:"content"`
+	User      User      `json:"user"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

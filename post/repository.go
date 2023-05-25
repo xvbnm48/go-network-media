@@ -14,6 +14,7 @@ type Repository interface {
 	CreatePost(post model.Post) (model.Post, error)
 	UpdatePost(post model.Post) (model.Post, error)
 	DestroyPost(id int) error
+	FindById(id int) (model.Post, error)
 }
 
 func NewPostRepository(db *gorm.DB) *repository {
@@ -56,4 +57,20 @@ func (r *repository) FindAll() ([]model.Post, error) {
 
 	return posts, nil
 
+}
+
+func (r *repository) FindById(id int) (model.Post, error) {
+	//post := &model.Post{}
+	//err := r.db.Preload("User").First(&post, id).Error
+	//if err != nil {
+	//	return post, err
+	//}
+	//
+	//return post, nil
+	post := model.Post{}
+	err := r.db.Preload("User").Where("id = ?", id).First(&post).Error
+	if err != nil {
+		return post, err
+	}
+	return post, nil
 }
