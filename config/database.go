@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/xvbnm48/go-network-media/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -23,4 +24,14 @@ func SetUpDatabase() (*gorm.DB, error) {
 	}
 
 	return db, nil
+}
+
+func RunMigrations(db *gorm.DB) error {
+	// Definisi migrasi di sini
+	err := db.AutoMigrate(&model.Post{})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
