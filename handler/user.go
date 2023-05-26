@@ -96,3 +96,28 @@ func (h *userHandler) FollowFriend(c *gin.Context) {
 	response := helper.ApiResponse("Follow Friend success", 200, "success", "success follow friend")
 	c.JSON(200, response)
 }
+
+func (h *userHandler) UnfollowFriend(c *gin.Context) {
+	friend := user.GetFollowId{}
+	err := c.ShouldBindUri(&friend)
+	if err != nil {
+		error := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": error}
+		response := helper.ApiResponse("Get Friend Id failed", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
+	}
+	currentUser := c.MustGet("currentUser").(model.User)
+	userId := currentUser.Id
+	_, err = h.service.UnfollowFriends(userId, friend.Id)
+	if err != nil {
+		error := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": error}
+		response := helper.ApiResponse("Unfollow Friend failed", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
+	}
+
+	response := helper.ApiResponse("Unfollow Friend success", 200, "success", "success unfollow friend")
+	c.JSON(200, response)
+}

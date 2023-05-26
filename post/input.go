@@ -6,6 +6,7 @@ type PostInput struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 	Author  string `json:"author"`
+	User    model.User
 }
 
 type UpdatePost struct {

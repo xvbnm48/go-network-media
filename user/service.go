@@ -12,7 +12,7 @@ type Service interface {
 	GetUserById(ID int) (model.User, error)
 	IsEmailAvailable(email string) (bool, error)
 	FollowFriends(userId int, friendId int) (int, error)
-	//UnfollowFriends(userId int, friendId int) (int, error)
+	UnfollowFriends(userId int, friendId int) (int, error)
 }
 
 type service struct {
@@ -101,6 +101,28 @@ func (s *service) FollowFriends(userId int, friendId int) (int, error) {
 	}
 
 	_, err = s.repo.Follow(userId, friendId)
+	if err != nil {
+		return 0, err
+	}
+
+	return friendId, nil
+}
+
+func (s *service) UnfollowFriends(userId int, friendId int) (int, error) {
+	_, err := s.repo.FindUserById(userId)
+	if err != nil {
+		return 0, err
+	}
+
+	_, err = s.repo.FindUserById(friendId)
+	if err != nil {
+		return 0, err
+	}
+	if userId == friendId {
+		return 0, errors.New("You can't unfollow yourself")
+	}
+
+	_, err = s.repo.Unfollow(userId, friendId)
 	if err != nil {
 		return 0, err
 	}

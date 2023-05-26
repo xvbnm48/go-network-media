@@ -30,10 +30,13 @@ func (h *postHandler) CreatePost(c *gin.Context) {
 	fmt.Println(currentUser.Id)
 	fmt.Println(currentUser.Name)
 	input.Author = currentUser.Name
+	input.User.Id = currentUser.Id
 
 	NewPost, err := h.service.CreatePost(input)
 	if err != nil {
-		response := helper.ApiResponse("Create post failed", 422, "error", nil)
+		error := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": error}
+		response := helper.ApiResponse("Create post failed", 422, "error", errorMessage)
 		c.JSON(422, response)
 		return
 	}
@@ -97,6 +100,7 @@ func (h *postHandler) UpdatePost(c *gin.Context) {
 	currentUser := c.MustGet("currentUser").(model.User)
 	inputPost.User = currentUser
 	inputPost.Author = currentUser.Name
+	inputPost.User.Id = currentUser.Id
 	fmt.Println("id dari jwt:", currentUser.Id)
 	//fmt.Println("isi input post setelah di isi currentUser", inputPost)
 	if err != nil {

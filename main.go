@@ -38,10 +38,11 @@ func main() {
 	api := router.Group("/api/v1")
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/login", userHandler.LoginUser)
-	api.POST("/createPost", authMiddleWare(authService, userService), postHandler.CreatePost)
+	api.POST("/post", authMiddleWare(authService, userService), postHandler.CreatePost)
 	api.POST("/post/:id", authMiddleWare(authService, userService), postHandler.UpdatePost)
 	api.GET("/posts", postHandler.GetAllPost)
 	api.POST("/users/:id/follow", authMiddleWare(authService, userService), userHandler.FollowFriend)
+	api.POST("/users/:id/unfollow", authMiddleWare(authService, userService), userHandler.UnfollowFriend)
 
 	router.Run(":8081")
 }

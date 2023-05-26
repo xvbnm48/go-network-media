@@ -86,7 +86,7 @@ func (r *repository) Unfollow(userId int, friendId int) (int, error) {
 	if err != nil {
 		return userId, err
 	}
-	err = r.db.Preload("Friends").Where("id ?", userId).First(&user).Error
+	err = r.db.Preload("Friends").Where("id = ?", userId).First(&user).Error
 	if err != nil {
 		return userId, err
 	}

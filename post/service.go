@@ -23,12 +23,14 @@ func NewServicePost(repository Repository) *service {
 	return &service{repository: repository}
 }
 
+//inputPost.Id = input.User.Id
+
 func (s *service) CreatePost(input PostInput) (model.Post, error) {
 	inputPost := model.Post{}
 	inputPost.Title = input.Title
 	inputPost.Content = input.Content
 	inputPost.Author = input.Author
-
+	inputPost.User.Id = input.User.Id
 	newPost, err := s.repository.CreatePost(inputPost)
 	if err != nil {
 		return newPost, err
