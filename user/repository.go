@@ -12,6 +12,7 @@ type Repository interface {
 	FindByEmail(email string) (model.User, error)
 	Follow(userId int, friendId int) (int, error)
 	Unfollow(userId int, friendId int) (int, error)
+	CountFollowers(id int) (int64, error)
 }
 
 type repository struct {
@@ -94,4 +95,13 @@ func (r *repository) Unfollow(userId int, friendId int) (int, error) {
 	err = r.db.Model(&user).Association("Friends").Delete(&friend)
 
 	return friendId, nil
+}
+func (r *repository) CountFollowers(id int) (int64, error) {
+	var count int64
+	err := r.db.Table("friendships").Where("friend_id = ?", id).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

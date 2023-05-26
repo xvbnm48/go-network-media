@@ -11,6 +11,6 @@ type LoginUserInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
-type GetFollowId struct {
+type GetUserId struct {
 	Id int `uri:"id" binding:"required"`
 }

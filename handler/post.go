@@ -139,3 +139,55 @@ func (h *postHandler) GetAllPost(c *gin.Context) {
 	response := helper.ApiResponse("Get all post success", 200, "success", formatPost)
 	c.JSON(200, response)
 }
+
+func (h *postHandler) DeletePost(c *gin.Context) {
+	postId := post.GetPostDetailInput{}
+	err := c.ShouldBindUri(&postId)
+	if err != nil {
+		error := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": error}
+		response := helper.ApiResponse("id post not found", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
+	}
+	currentUser := c.MustGet("currentUser").(model.User)
+	err = h.service.DeletePost(postId.Id, currentUser.Id)
+	if err != nil {
+		error := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": error}
+		response := helper.ApiResponse("id post not found", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
+	}
+
+	SuccessMessage := gin.H{
+		"is_deleted": true,
+		"message":    "success deleted post! with id: " + string(postId.Id),
+	}
+
+	response := helper.ApiResponse("delete post success", 200, "success", SuccessMessage)
+	c.JSON(200, response)
+}
+
+func (h *postHandler) GetPostById(c *gin.Context) {
+	postId := post.GetPostDetailInput{}
+	err := c.ShouldBindUri(&postId)
+	if err != nil {
+		error := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": error}
+		response := helper.ApiResponse("id post not found", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
+	}
+	Findpost, err := h.service.GetPostById(postId.Id)
+	if err != nil {
+		error := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": error}
+		response := helper.ApiResponse("id post not found", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
+	}
+	formatPost := post.FormatPost(Findpost)
+	response := helper.ApiResponse("Get post by id success", 200, "success", formatPost)
+	c.JSON(200, response)
+}

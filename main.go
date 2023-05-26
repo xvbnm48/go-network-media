@@ -35,14 +35,21 @@ func main() {
 	postHandler := handler.NewPostHandler(postService)
 
 	router := gin.Default()
+
+	//user
 	api := router.Group("/api/v1")
-	api.POST("/users", userHandler.RegisterUser)
-	api.POST("/login", userHandler.LoginUser)
+	api.POST("/users/register", userHandler.RegisterUser)
+	api.POST("/user/login", userHandler.LoginUser)
+	api.POST("/users/:id/follow", authMiddleWare(authService, userService), userHandler.FollowFriend)
+	api.POST("/users/:id/unfollow", authMiddleWare(authService, userService), userHandler.UnfollowFriend)
+	api.GET("/users/:id", authMiddleWare(authService, userService), userHandler.GetUserById)
+
+	// post
 	api.POST("/post", authMiddleWare(authService, userService), postHandler.CreatePost)
 	api.POST("/post/:id", authMiddleWare(authService, userService), postHandler.UpdatePost)
 	api.GET("/posts", postHandler.GetAllPost)
-	api.POST("/users/:id/follow", authMiddleWare(authService, userService), userHandler.FollowFriend)
-	api.POST("/users/:id/unfollow", authMiddleWare(authService, userService), userHandler.UnfollowFriend)
+	api.POST("/post/:id/delete", authMiddleWare(authService, userService), postHandler.DeletePost)
+	api.GET("/post/:id", postHandler.GetPostById)
 
 	router.Run(":8081")
 }
@@ -68,7 +75,9 @@ func authMiddleWare(authService auth.Service, userService user.Service) gin.Hand
 		}
 		claim, ok := token.Claims.(jwt.MapClaims)
 		if !ok || !token.Valid {
-			response := helper.ApiResponse("unauthorized", http.StatusUnauthorized, "error", nil)
+			error := helper.FormatValidationError(err)
+			errorMessage := gin.H{"errors": error}
+			response := helper.ApiResponse("unauthorized", http.StatusUnauthorized, "error", errorMessage)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}

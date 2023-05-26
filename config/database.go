@@ -6,6 +6,7 @@ import (
 	"github.com/xvbnm48/go-network-media/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func SetUpDatabase() (*gorm.DB, error) {
@@ -18,7 +19,7 @@ func SetUpDatabase() (*gorm.DB, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		dbConfig.GetUsername(), dbConfig.GetPassword(), dbConfig.GetHost(),
 		dbConfig.GetPort(), dbConfig.GetDatabaseName())
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
 		return nil, err
 	}

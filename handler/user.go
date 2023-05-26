@@ -75,7 +75,7 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 }
 
 func (h *userHandler) FollowFriend(c *gin.Context) {
-	friendId := user.GetFollowId{}
+	friendId := user.GetUserId{}
 	err := c.ShouldBindUri(&friendId)
 	if err != nil {
 		errorMessage := gin.H{"errors": err.Error()}
@@ -98,7 +98,7 @@ func (h *userHandler) FollowFriend(c *gin.Context) {
 }
 
 func (h *userHandler) UnfollowFriend(c *gin.Context) {
-	friend := user.GetFollowId{}
+	friend := user.GetUserId{}
 	err := c.ShouldBindUri(&friend)
 	if err != nil {
 		error := helper.FormatValidationError(err)
@@ -120,4 +120,30 @@ func (h *userHandler) UnfollowFriend(c *gin.Context) {
 
 	response := helper.ApiResponse("Unfollow Friend success", 200, "success", "success unfollow friend")
 	c.JSON(200, response)
+}
+
+func (h *userHandler) GetUserById(c *gin.Context) {
+	userid := user.GetUserId{}
+	err := c.ShouldBindUri(&userid)
+	if err != nil {
+		error := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": error}
+		response := helper.ApiResponse("Get Friend Id failed", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
+	}
+
+	getUser, err := h.service.GetUserById(userid.Id)
+	if err != nil {
+		error := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": error}
+		response := helper.ApiResponse("Get Friend Id failed", 422, "error", errorMessage)
+		c.JSON(422, response)
+		return
+	}
+	formatter := user.FormatUserWithFriends(getUser)
+	response := helper.ApiResponse("Get User success", 200, "success", formatter)
+
+	c.JSON(200, response)
+
 }

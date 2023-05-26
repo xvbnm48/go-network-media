@@ -13,10 +13,9 @@ type service struct {
 type Service interface {
 	GetAllPost() ([]model.Post, error)
 	CreatePost(input PostInput) (model.Post, error)
-	DeletePost(id int) error
-	//UpdatePost(InputID GetPostDetailInput, input UpdatePost) (model.Post, error)
-	//UpdatePost(post PostInput, postId int, userId int) (model.Post, error)
+	DeletePost(id int, userId int) error
 	UpdatePost(inputID GetPostDetailInput, inputPost UpdatePost) (model.Post, error)
+	GetPostById(id int) (model.Post, error)
 }
 
 func NewServicePost(repository Repository) *service {
@@ -40,7 +39,7 @@ func (s *service) CreatePost(input PostInput) (model.Post, error) {
 }
 
 func (s *service) UpdatePost(inputID GetPostDetailInput, inputPost UpdatePost) (model.Post, error) {
-	post, err := s.repository.FindById(inputID.Id)
+	post, err := s.repository.FindPostById(inputID.Id)
 	fmt.Println("isi post dari hasil data findbyid: ", post)
 	if err != nil {
 		return post, err
@@ -61,57 +60,10 @@ func (s *service) UpdatePost(inputID GetPostDetailInput, inputPost UpdatePost) (
 	return updatePost, nil
 }
 
-//func (s *service) UpdatePost(InputID GetPostDetailInput, input UpdatePost) (model.Post, error) {
-//	oldPost := model.Post{}
-//	updatedPost, err := s.repository.FindById(oldPost)
-//	if err != nil {
-//		return updatedPost, err
-//	}
-//
-//	//	post, err := s.repository.FindById(InputID.Id)
-//	//	if err != nil {
-//	//		return post, err
-//	//	}
-//	//
-//	//	if post.Id != input.id {
-//	//		return post, errors.New("post not found")
-//	//	}
-//	//	inputPost := model.Post{}
-//	//	inputPost.Title = input.Title
-//	//	inputPost.Content = input.Content
-//	//	inputPost.Author = input.Author
-//	//
-//	//	updatePost, err := s.repository.UpdatePost(inputPost)
-//	//	if err != nil {
-//	//		return updatePost, err
-//	//	}
-//	//
-//	//	return updatePost, nil
-//}
-
-//func (s *service) UpdatePost(post PostInput, postId int, userId int) (model.Post, error) {
-//	// postId from uri, userID from token
-//	oldPost, err := s.repository.FindById(postId)
-//	if err != nil {
-//		return oldPost, err
-//	}
-//	fmt.Println("oldp post user ", oldPost.User, "user id dari context", userId, "oldpost id", oldPost.Id)
-//	if oldPost.User.Id != userId {
-//		return oldPost, errors.New("you are not the owner of this post")
-//	}
-//
-//	oldPost.Title = post.Title
-//	oldPost.Content = post.Content
-//	oldPost.Author = post.Author
-//	updatedPost, err := s.repository.UpdatePost(oldPost)
-//	if err != nil {
-//		return updatedPost, err
-//	}
-//
-//	return updatedPost, nil
-//}
-
-func (s *service) DeletePost(id int) error {
+func (s *service) DeletePost(id int, userId int) error {
+	if id != userId {
+		return errors.New("you are not the owner of this post")
+	}
 	post := s.repository.DestroyPost(id)
 	if post != nil {
 		return post
@@ -127,4 +79,12 @@ func (s *service) GetAllPost() ([]model.Post, error) {
 	}
 
 	return posts, nil
+}
+
+func (s *service) GetPostById(id int) (model.Post, error) {
+	post, err := s.repository.FindPostById(id)
+	if err != nil {
+		return post, err
+	}
+	return post, nil
 }
