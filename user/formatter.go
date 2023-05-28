@@ -39,13 +39,3 @@ func FormatUser(user model.User, token string) userFormatter {
 
 	return formatter
 }
-
-//
-//func FormatUserWithFriends(user model.User) {
-//	formatter := userFormatterWithFriends{
-//		ID:        user.Id,
-//		Name:      user.Name,
-//		Email:     user.Email,
-//		Followers: user.Friends,
-//	}
-//}
