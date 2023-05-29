@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"github.com/xvbnm48/go-network-media/model"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -13,6 +14,7 @@ type Service interface {
 	IsEmailAvailable(email string) (bool, error)
 	FollowFriends(userId int, friendId int) (int, error)
 	UnfollowFriends(userId int, friendId int) (int, error)
+	CountFollowers(id int) (int64, error)
 }
 
 type service struct {
@@ -69,6 +71,19 @@ func (s *service) GetUserById(ID int) (model.User, error) {
 	if user.Id == 0 {
 		return user, errors.New("No user found on that ID")
 	}
+
+	followers, err := s.repo.CountFollowers(ID)
+	fmt.Println("jumlah followers", followers)
+	if err != nil {
+		return user, err
+	}
+
+	following, err := s.repo.CountFollowing(ID)
+	if err != nil {
+		return user, nil
+	}
+	user.Following = following
+	user.Followers = followers
 
 	return user, nil
 }
@@ -128,4 +143,13 @@ func (s *service) UnfollowFriends(userId int, friendId int) (int, error) {
 	}
 
 	return friendId, nil
+}
+
+func (s *service) CountFollowers(id int) (int64, error) {
+	count, err := s.repo.CountFollowers(id)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

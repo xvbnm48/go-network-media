@@ -10,18 +10,20 @@ type userFormatter struct {
 }
 
 type UserFormatterWithFriends struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	//Followers int64  `json:"followers"`
+	ID        int    `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Followers int64  `json:"followers"`
+	Following int64  `json:"following"`
 }
 
 func FormatUserWithFriends(user model.User) UserFormatterWithFriends {
 	formatter := UserFormatterWithFriends{
-		ID:    user.Id,
-		Name:  user.Name,
-		Email: user.Email,
-		//Followers: user.Friends,
+		ID:        user.Id,
+		Name:      user.Name,
+		Email:     user.Email,
+		Followers: user.Followers,
+		Following: user.Following,
 	}
 
 	return formatter

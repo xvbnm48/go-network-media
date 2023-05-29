@@ -147,3 +147,10 @@ func (h *userHandler) GetUserById(c *gin.Context) {
 	c.JSON(200, response)
 
 }
+
+func (h *userHandler) FetchUser(c *gin.Context) {
+	currentUser := c.MustGet("currentUser").(model.User)
+	formatter := user.FormatUser(currentUser, "")
+	response := helper.ApiResponse("Get User success", 200, "success", formatter)
+	c.JSON(200, response)
+}

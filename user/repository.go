@@ -13,6 +13,7 @@ type Repository interface {
 	Follow(userId int, friendId int) (int, error)
 	Unfollow(userId int, friendId int) (int, error)
 	CountFollowers(id int) (int64, error)
+	CountFollowing(id int) (int64, error)
 }
 
 type repository struct {
@@ -98,10 +99,17 @@ func (r *repository) Unfollow(userId int, friendId int) (int, error) {
 }
 func (r *repository) CountFollowers(id int) (int64, error) {
 	var count int64
-	err := r.db.Table("friendships").Where("friend_id = ?", id).Count(&count).Error
+	err := r.db.Debug().Table("friendships").Select("friend_id").Where("friend_id = ?", id).Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
 
+	return count, nil
+}
+
+func (r *repository) CountFollowing(id int) (int64, error) {
+	user := model.User{}
+	user.Id = id
+	count := r.db.Debug().Model(&user).Association("Friends").Count()
 	return count, nil
 }
