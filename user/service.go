@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/xvbnm48/go-network-media/model"
+	"github.com/xvbnm48/go-network-media/post"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -19,10 +20,11 @@ type Service interface {
 
 type service struct {
 	repo Repository
+	Post post.Repository
 }
 
-func NewService(repo Repository) *service {
-	return &service{repo}
+func NewService(repo Repository, post post.Repository) *service {
+	return &service{repo, post}
 }
 
 func (s *service) RegisterUser(input RegisterUserInput) (model.User, error) {
@@ -63,6 +65,13 @@ func (s *service) LoginUser(input LoginUserInput) (model.User, error) {
 	return user, nil
 }
 
+type postTemp struct {
+	PostId  int
+	Title   string
+	Content string
+	Author  string
+}
+
 func (s *service) GetUserById(ID int) (model.User, error) {
 	user, err := s.repo.FindUserById(ID)
 	if err != nil {
@@ -78,12 +87,24 @@ func (s *service) GetUserById(ID int) (model.User, error) {
 		return user, err
 	}
 
+	var post []model.AllPost
+	AllPost, err := s.Post.FindAllPosts(ID, post)
+	if err != nil {
+		return user, err
+	}
+	fmt.Println("jumlah post", AllPost)
+
 	following, err := s.repo.CountFollowing(ID)
 	if err != nil {
 		return user, nil
 	}
+
 	user.Following = following
 	user.Followers = followers
+	user.Posts = AllPost
+	if user.Posts == nil {
+		user.Posts = []model.AllPost{}
+	}
 
 	return user, nil
 }

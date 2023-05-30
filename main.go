@@ -7,6 +7,7 @@ import (
 	"github.com/xvbnm48/go-network-media/config"
 	"github.com/xvbnm48/go-network-media/handler"
 	"github.com/xvbnm48/go-network-media/helper"
+	"github.com/xvbnm48/go-network-media/model"
 	"github.com/xvbnm48/go-network-media/post"
 	"github.com/xvbnm48/go-network-media/user"
 	"log"
@@ -19,13 +20,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = config.RunMigrations(db)
+	err = db.AutoMigrate(&model.Reaction{})
 	// user repo
 	userRepository := user.NewRepository(db)
 	postRepository := post.NewPostRepository(db)
 
 	//service user
-	userService := user.NewService(userRepository)
+	userService := user.NewService(userRepository, postRepository)
 	postService := post.NewServicePost(postRepository)
 
 	//auth service
@@ -90,5 +91,6 @@ func authMiddleWare(authService auth.Service, userService user.Service) gin.Hand
 			return
 		}
 		c.Set("currentUser", user)
+		// this is for get user by id with token
 	}
 }

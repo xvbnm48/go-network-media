@@ -29,7 +29,7 @@ func SetUpDatabase() (*gorm.DB, error) {
 
 func RunMigrations(db *gorm.DB) error {
 	// Definisi migrasi di sini
-	err := db.AutoMigrate(&model.Post{})
+	err := db.AutoMigrate(&model.Reaction{})
 	if err != nil {
 		return err
 	}

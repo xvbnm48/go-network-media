@@ -15,6 +15,7 @@ type Repository interface {
 	UpdatePost(post model.Post) (model.Post, error)
 	DestroyPost(id int) error
 	FindPostById(id int) (model.Post, error)
+	FindAllPosts(userId int, post []model.AllPost) ([]model.AllPost, error)
 }
 
 func NewPostRepository(db *gorm.DB) *repository {
@@ -73,4 +74,13 @@ func (r *repository) FindPostById(id int) (model.Post, error) {
 		return post, err
 	}
 	return post, nil
+}
+
+func (r *repository) FindAllPosts(userId int, post []model.AllPost) ([]model.AllPost, error) {
+	var posts = post
+	err := r.db.Debug().Raw("SELECT * FROM posts WHERE user_id = ? AND posts.deleted_at is NULL", userId).Scan(&posts).Error
+	if err != nil {
+		return posts, err
+	}
+	return posts, nil
 }

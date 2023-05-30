@@ -69,12 +69,12 @@ func (r *repository) Follow(userId int, friendId int) (int, error) {
 		return userId, err
 	}
 
-	err = r.db.Preload("Friends").Where("id = ?", userId).First(&user).Error
+	err = r.db.Debug().Preload("Friends").Where("id = ?", userId).First(&user).Error
 	if err != nil {
 		return userId, err
 	}
 
-	err = r.db.Model(&user).Association("Friends").Append(&friend)
+	err = r.db.Debug().Model(&user).Association("Friends").Append(&friend)
 	if err != nil {
 		return userId, err
 	}
