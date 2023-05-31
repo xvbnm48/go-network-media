@@ -7,7 +7,6 @@ import (
 	"github.com/xvbnm48/go-network-media/config"
 	"github.com/xvbnm48/go-network-media/handler"
 	"github.com/xvbnm48/go-network-media/helper"
-	"github.com/xvbnm48/go-network-media/model"
 	"github.com/xvbnm48/go-network-media/post"
 	"github.com/xvbnm48/go-network-media/user"
 	"log"
@@ -20,7 +19,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = db.AutoMigrate(&model.Reaction{})
+	err = config.RunMigrations(db)
 	// user repo
 	userRepository := user.NewRepository(db)
 	postRepository := post.NewPostRepository(db)
