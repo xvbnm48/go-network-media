@@ -15,11 +15,15 @@ import (
 )
 
 func main() {
+	// for set up database
 	db, err := config.SetUpDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//for run migration
 	err = config.RunMigrations(db)
+
 	// user repo
 	userRepository := user.NewRepository(db)
 	postRepository := post.NewPostRepository(db)
