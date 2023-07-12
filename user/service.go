@@ -27,6 +27,7 @@ func NewService(repo Repository, post post.Repository) *service {
 	return &service{repo, post}
 }
 
+// func for register user
 func (s *service) RegisterUser(input RegisterUserInput) (model.User, error) {
 	user := model.User{}
 	user.Name = input.Name
